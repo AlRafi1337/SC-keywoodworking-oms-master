@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: KeeWoodworking_DB
+    ports:
+      - "5432:5432"  # PostgreSQL default port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: keewoodworking-api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=KeeWoodworking_DB;Username=admin;Password=admin123
+      - ConnectionStrings__IdentityConnection=Host=db;Port=5432;Database=KeeWoodworking_DB;Username=admin;Password=admin123
+    ports:
+      - "5000:80"  # Expose API on localhost:5000
+    restart: always
+
+volumes:
+  postgres_data:
